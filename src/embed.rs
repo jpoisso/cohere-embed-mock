@@ -3,8 +3,6 @@ use actix_web::{post, web, HttpResponse};
 use candle_core::{Device, Tensor};
 use candle_nn::VarBuilder;
 use candle_transformers::models::bert::{BertModel, Config, DTYPE};
-use hf_hub::api::sync::ApiBuilder;
-use hf_hub::{Repo, RepoType};
 use serde::{Deserialize, Serialize};
 use std::cmp::max;
 use std::collections::HashMap;
@@ -71,35 +69,15 @@ pub(crate) async fn post_embeddings(
     }
 }
 
-pub(crate) fn load_configurations<'a>(
-    model_id: String,
-    model_revision: String,
-    device: Device,
-) -> Result<EmbedModelConfig<'a>> {
+pub(crate) fn load_configurations<'a>() -> Result<EmbedModelConfig<'a>> {
     let start = chrono::Local::now();
-    let api = ApiBuilder::new()
-        .with_progress(true)
-        .build()
-        .map_err(Error::from)?;
-    let repo = api.repo(Repo::with_revision(
-        model_id,
-        RepoType::Model,
-        model_revision,
-    ));
-    let (config_filename, tokenizer_filename, weights_filename) = {
-        let config = repo.get("config.json").map_err(Error::from)?;
-        let tokenizer = repo.get("tokenizer.json").map_err(Error::from)?;
-        let weights = repo.get("model.safetensors").map_err(Error::from)?;
-        (config, tokenizer, weights)
-    };
-    let config =
-        std::fs::read_to_string(config_filename).map_err(|e| Error::Embed(e.to_string()))?;
-    let config: Config = serde_json::from_str(&config).map_err(|e| Error::Embed(e.to_string()))?;
-    let tokenizer = Tokenizer::from_file(tokenizer_filename).map_err(Error::from)?;
-    let vb = unsafe {
-        VarBuilder::from_mmaped_safetensors(&[weights_filename], DTYPE, &device)
-            .map_err(Error::from)?
-    };
+    let device = Device::Cpu;
+    let config: Config = serde_json::from_str(include_str!("../model/config.json"))
+        .map_err(|e| Error::Embed(e.to_string()))?;
+    let tokenizer =
+        Tokenizer::from_bytes(include_bytes!("../model/tokenizer.json")).map_err(Error::from)?;
+    let weights = include_bytes!("../model/model.safetensors");
+    let vb = VarBuilder::from_slice_safetensors(weights, DTYPE, &device).map_err(Error::from)?;
     let elapsed = (chrono::Local::now() - start).num_milliseconds();
     info!("loaded embed model configurations in {elapsed} ms",);
     Ok(EmbedModelConfig {

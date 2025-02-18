@@ -15,7 +15,6 @@ actix-cors = { version = "0.7.0", default-features = false }
 dotenvy = {version = "0.15.7", default-features = false}
 tracing = { version = "0.1.41", features = ["std"], default-features = false }
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "ansi", "env-filter"], default-features = false }
-hf-hub = { version = "0.4.1", features = ["rustls-tls", "tokio", "ureq"],  default-features = false  }
 candle-core = { version = "0.8.3", features = [], default-features = false }
 candle-transformers = { version = "0.8.3", features = [], default-features = false }
 candle-nn = { version = "0.8.3", features = [], default-features = false }

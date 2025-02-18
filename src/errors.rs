@@ -29,12 +29,6 @@ impl From<Box<dyn std::error::Error + Send + Sync>> for Error {
     }
 }
 
-impl From<hf_hub::api::sync::ApiError> for Error {
-    fn from(error: hf_hub::api::sync::ApiError) -> Self {
-        Error::Embed(error.to_string())
-    }
-}
-
 impl From<candle_core::Error> for Error {
     fn from(error: candle_core::Error) -> Self {
         Error::Embed(error.to_string())

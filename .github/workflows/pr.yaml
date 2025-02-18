@@ -1,0 +1,47 @@
+name: Verify
+
+on:
+  push:
+    branches:
+      - main
+      - '!release-*'
+  pull_request:
+    branches:
+      - main
+      - '!release-*'
+
+jobs:
+  verify-rust:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install Cargo Components
+        run: |
+          cargo install cargo-machete
+          cargo install cargo-audit
+
+      - name: Lint
+        run: cargo clippy --all -- -D warnings
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Test
+        run: cargo test
+
+      - name: Machete
+        run: cargo machete
+
+      - name: Audit
+        run: cargo audit
+
+      - name: Build
+        run: cargo build

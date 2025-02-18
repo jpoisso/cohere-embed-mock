@@ -1,0 +1,15 @@
+### Health
+GET http://localhost:8080/api/health
+
+###
+POST http://localhost:8080/v1/embed
+Content-Type: application/json
+Accept: application/json
+
+{
+    "texts": [
+        "fishing, the sport of catching fish, freshwater or saltwater, typically with rod, line, and hook.",
+        "A staple of crime television shows is the image of a suspect sweating nervously in an interrogation room as the detectives use a polygraph test to decide whether the suspect is innocent or guilty.",
+        "The 1958 film 'The Wizard of Oz' is a 1939 American romantic comedy film directed by Ernest Hemingway"
+    ]
+}

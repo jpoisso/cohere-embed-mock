@@ -72,11 +72,11 @@ pub(crate) async fn post_embeddings(
 pub(crate) fn load_configurations<'a>() -> Result<EmbedModelConfig<'a>> {
     let start = chrono::Local::now();
     let device = Device::Cpu;
-    let config: Config = serde_json::from_str(include_str!("../model/config.json"))
+    let config: Config = serde_json::from_str(include_str!("model/config.json"))
         .map_err(|e| Error::Embed(e.to_string()))?;
     let tokenizer =
-        Tokenizer::from_bytes(include_bytes!("../model/tokenizer.json")).map_err(Error::from)?;
-    let weights = include_bytes!("../model/model.safetensors");
+        Tokenizer::from_bytes(include_bytes!("model/tokenizer.json")).map_err(Error::from)?;
+    let weights = include_bytes!("model/model.safetensors");
     let vb = VarBuilder::from_slice_safetensors(weights, DTYPE, &device).map_err(Error::from)?;
     let elapsed = (chrono::Local::now() - start).num_milliseconds();
     info!("loaded embed model configurations in {elapsed} ms",);

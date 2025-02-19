@@ -5,9 +5,9 @@ mod health;
 use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::{middleware, App, HttpServer};
-use dotenvy::dotenv;
 use std::env;
 use tracing::info;
+use tracing_subscriber::{fmt, layer::SubscriberExt, EnvFilter, Registry};
 
 use errors::{Error, Result};
 
@@ -15,9 +15,14 @@ const NUM_WEB_WORKERS: usize = 10;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-    dotenv().ok();
-
-    tracing_subscriber::fmt::init();
+    tracing::subscriber::set_global_default(
+        Registry::default().with(fmt::layer().compact()).with(
+            EnvFilter::try_from_default_env()
+                .or_else(|_| EnvFilter::try_new("debug"))
+                .expect("failed to initialize tracing filter layer, exiting."),
+        ),
+    )
+    .map_err(|err| Error::Server(err.to_string()))?;
 
     let config = embed::load_configurations()?;
     let host = env::var("HOSTNAME").unwrap_or("localhost".to_string());

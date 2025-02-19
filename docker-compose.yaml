@@ -1,0 +1,19 @@
+services:
+    
+  cohere-embed-mock:
+    image: jofish89/cohere-embed-mock
+    restart: always
+    environment:
+      - RUST_LOG=debug
+    ports:
+      - "8080:8080"
+
+  cohere-embed-mock-dev:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - RUST_LOG=debug
+    ports:
+      - "8080:8080"

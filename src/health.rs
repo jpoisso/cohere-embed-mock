@@ -1,6 +1,6 @@
 use actix_web::{get, HttpResponse};
 
-#[get("/api/health")]
+#[get("/health")]
 pub(crate) async fn up() -> HttpResponse {
     HttpResponse::Ok().body("up".to_string())
 }
